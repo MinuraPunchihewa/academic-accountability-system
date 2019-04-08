@@ -1,0 +1,28 @@
+<% include partials/header.ejs %>
+
+<div class="ui main text container">
+    <div class="ui huge header centered">Academic Accountability System</div>
+    <div class="ui top attached segment">
+        <div class="ui divided items">
+            <% academics.forEach(function(academic){ %>
+                <div class="item">
+                    <div class="image">
+                        <img src="<%= academic.profilePicture %>">
+                    </div>
+                    <div class="content">
+                        <a href="/academics/<%= academic._id %>" class="header"> <%= academic.prefix %> <%= academic.firstName %> <%= academic.secondName %> </a>
+                        <div class="description">
+                            <p> <%= academic.jobTitle %> </p>
+                            <p> <%= academic.department %> </p>
+                            <p> <%= academic.faculty %> </p>
+                            <br>
+                            <a href="/academics/<%= academic._id %>" class="ui primary basic button">Show More</a>
+                        </div>
+                    </div>              
+                </div>
+            <% }); %>
+        </div>
+    </div>
+</div>
+
+<% include partials/footer.ejs %>

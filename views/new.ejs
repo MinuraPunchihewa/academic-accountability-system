@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Academic Accountability System</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js" type="text/javascript" async></script>
+        <script src="/scripts/new.js"></script>
+    </head>
+    <body>
+            <div class="ui secondary pointing menu">
+                <a href="/" class="header item">Academic Accountability System</a>
+                <a href="/" class="active item">Home</a>
+                <div class="right menu">
+                      <a class="ui item">Login</a>
+                      <a href="/academics/new" class="ui item">Sign Up</a>
+                      <a class="ui item">Logout</a>
+                </div>
+            </div>
+
+<div class="ui main text container segment">
+        <div class="ui huge header">Create Your Profile</div>
+        <form action="/academics" enctype="multipart/form-data" method="POST" class="ui form">
+            <div class="field">
+                    <label for="profilePicture">Profile Picture</label>
+                    <input type="file" name="profilePicture" placeholder="Profile Picture" class="inputfile">
+            </div>
+            
+            <div class="field">
+                <label for="prefix">Prefix</label>
+                <select class="ui search dropdown" name="prefix" id="academic[prefix]">
+                    <option value="" hidden>Prefix</option>
+                    <option value="Ms">Ms</option>
+                    <option value="Mr">Mr</option>
+                    <option value="Mrs">Mrs</option>
+                    <option value="Dr">Dr</option>
+                    <option value="Prof">Prof</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="firstName">First Name</label>
+                <input type="text" name="firstName" placeholder="First Name">
+            </div>
+    
+            <div class="field">
+                <label for="secondName">Second Name</label>
+                <input type="text" name="secondName" placeholder="Second Name">
+            </div>
+
+            <div class="field">
+                    <label for="emailAddress">Email Address</label>
+                    <input type="email" name="emailAddress" placeholder="Email Address">
+            </div>    
+            
+            <div class="field">
+                <label for="telephoneNumber">Telephone Number</label>
+                <input type="tel" name="telephoneNumber" placeholder="Telephone Number">
+            </div> 
+
+            <div class="field">
+                    <label for="jobTitle">Job Title</label>
+                    <input name="jobTitle" placeholder="Job Title">
+            </div>
+            
+            <div class="field">
+                <label for="faculty">Faculty</label>
+                <select class="ui search dropdown" name="faculty" id="faculty">
+                    <option value="" hidden>Faculty</option>
+                    <option value="Faculty of Commerce & Management Studies">Faculty of Commerce & Management Studies</option>
+                    <option value="Faculty of Computing & Technology">Faculty of Computing & Technology</option>
+                    <option value="Faculty of Graduate Studies">Faculty of Graduate Studies</option>
+                    <option value="Faculty of Humanities">Faculty of Humanities</option>
+                    <option value="Faculty of Medicine">Faculty of Medicine</option>
+                    <option value="Faculty of Science">Faculty of Science</option>
+                    <option value="Faculty of Social Sciences">Faculty of Social Sciences</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="academic[department]">Department</label>
+                <select class="ui search dropdown" name="department" id="department">
+                    <option value="" hidden>Department</option>
+                </select>
+            </div>
+            
+            <input type="submit" class="ui primary basic big button" value="Create Profile">
+        </form>
+    </div>
+
+<% include partials/footer.ejs %>
