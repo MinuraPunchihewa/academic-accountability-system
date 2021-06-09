@@ -10,6 +10,12 @@ var userSchema = new mongoose.Schema({
     jobTitle: String, 
     department: String,
     faculty: String, 
+    forms: [
+        {
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: "Form"
+        }
+    ],
     created: {type: Date, default: Date.now}
 });
 

@@ -1,0 +1,62 @@
+<% include ../partials/header.ejs %>         
+
+<div class="ui main text container segment">
+        <div class="ui huge header">Self-Evaluation Questionnaire</div>
+        <form action="/academics/<%= academic._id %>/forms %>" enctype="multipart/form-data" method="POST" class="ui form">
+            <div class="field">
+                <label for="">Name:</label>
+                <p><%= academic.prefix %> <%= academic.firstName %> <%= academic.secondName %></p>
+            </div>
+            <div class="field">
+                <label for="">Academic Year:</label>
+                <input type="text" name="academicYear" placeholder="Academic Year" required pattern="[0-9]{4}/[0-9]{2}">
+            </div>
+            <div class="field">
+                <label for="semester">Semester:</label>
+                <select class="ui search dropdown" name="semester" id="semester" required>
+                        <option value="" hidden>Semester</option>
+                        <option value="Semester 1">Semester 1</option>
+                        <option value="Semester 2">Semester 2</option>
+                </select>
+            </div>
+            <br>
+
+            <% var count = 1; %>
+            <% questions.forEach(function(question){ %>
+                <% if(question.options.length == 1){ %>
+                    <div class="field">
+                        <label for="answerTextArr[]" style="font-size: medium;"><%= count %>. <%= question.questionText %></label>
+                        <label style="font-size: small;">Hint: <%= question.helpText %></label>
+                        <textarea name="answerTextArr[]" cols="30" rows="5"></textarea>
+                    </div>
+                    <% count++; %>
+                <% } else{ %>
+                    <% if(question.multiplier == "Yes/No"){ %>
+                        <div class="field">
+                            <label style="font-size: medium;"><%= count %> . <%= question.questionText %></label>
+                            <label style="font-size: small;">Hint: <%= question.helpText %></label>
+                            <input type="radio" name="optionAnswerTextArr[]" id="yes" value="Yes" required style="display: inline;">
+                            <label style="display: inline;" for="yes" class="pr-5">Yes</label>       
+                            <div class="mb-1"></div>    
+                            <input type="radio" name="optionAnswerTextArr[]" id="yes" value="No" required style="display: inline;">
+                            <label style="display: inline;" for="no" class="pr-5">No</label>
+                        </div>
+                        <% count++; %>
+                    <% } else{ %>
+                        <div class="field">
+                            <label style="font-size: medium;"><%= count %> . <%= question.questionText %></label>
+                            <label style="font-size: small;">Hint: <%= question.helpText %></label>
+                            <% question.options.forEach(function(option){ %>
+                                <label for="optionAnswerTextArr[]"><%= option.optionText %></label>
+                                <textarea name="optionAnswerTextArr[]" cols="30" rows="2"></textarea>
+                            <% }) %>
+                        </div>
+                        <% count++; %>
+                    <% } %>
+                <% } %>
+            <% }) %>
+            <input style="width: 100%; font-family: Lato, Helvetica;" type="submit" class="btn btn-secondary btn-lg" value="SUBMIT"> 
+        </form>
+</div>
+
+<% include ../partials/footer.ejs %>

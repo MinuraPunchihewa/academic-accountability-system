@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Academic Accountability System</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">   
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">  
+        <link rel="stylesheet" type="text/css" href="/stylesheets/analytics.css">
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                        <img src="/images/AAS_Logo.svg" style="height: 100%; width: 100%;">
+                </a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                        <div class="navbar-nav ml-auto" style="font-size: medium; font-family:  Lato, Helvetica;">
+                            <a class="nav-item nav-link active" href="/">Home <span class="sr-only">(current)</span></a> 
+                            <% if(!currentUser){ %>
+                                <a class="nav-item nav-link" href="/login">Login</a>
+                            <% } else{ %>
+                                <% if(currentUser.role == "Head of Department" | currentUser.role == "Dean"){ %>
+                                    <div class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Academic Accountability <span class="badge"><%= notifications.length %></span></a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                        <% var approvalNotificationCount = 0; %>
+                                        <% var formNotificationCount     = 0; %>
+                                        <% if (!(notifications === undefined || notifications.length == 0)){ %>
+                                            <% notifications.forEach(function(notification){ %>
+                                                <% if(notification.type == "Approval" && notification.isRead == false){ %>
+                                                    <% approvalNotificationCount++; %>
+                                                <% } if(notification.type == "Form" && notification.isRead == false){ %>
+                                                    <% formNotificationCount++; %>
+                                                <% } %>
+                                            <% }) %>
+                                        <% } %> 
+                                            <% if(formNotificationCount == 0){ %>
+                                                <a class="dropdown-item disabled" href="#">Submit Form <span class="badge"><%= formNotificationCount %></span></a>
+                                            <% } else{ %>
+                                                <a class="dropdown-item disabled" href="#">Submit Form <span class="badge"><%= formNotificationCount %></span></a>
+                                                <% notifications.forEach(function(notification){ %>
+                                                    <% if(notification.type == "Form" && notification.isRead == false){ %>
+                                                        <a class="dropdown-item" href="notifications/<%= notification._id %>">   <%= notification.text %></a>
+                                                    <% } %>
+                                                <% }) %>
+                                            <% } %>
+                                            
+                                            <% if(approvalNotificationCount == 0){ %>
+                                                <a class="dropdown-item disabled" href="#">View Submissions <span class="badge"><%= approvalNotificationCount %></span></a>
+                                            <% } else{ %>
+                                                <a class="dropdown-item disabled" href="#">View Submissions <span class="badge"><%= approvalNotificationCount %></span></a>
+                                                <% notifications.forEach(function(notification){ %>
+                                                    <% if(notification.type == "Approval" && notification.isRead == false){ %>
+                                                        <a class="dropdown-item" href="/notifications/<%= notification._id %>">   <%= notification.text %></a>
+                                                    <% } %>
+                                                <% }) %>
+                                            <% } %>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item" href="#">Analytics</a>
+                                        </div>
+                                    </div>
+                                    <div class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Signed In As <%= currentUser.username %>
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                          <a class="dropdown-item" href="/academics/<%= currentUser.user.id %>">My Account</a>
+                                          <div class="dropdown-divider"></div>
+                                          <a class="dropdown-item" href="/academics">View Accounts</a>
+                                        </div>
+                                    </div>
+                                <% } %>
+                                <% if(currentUser.role == "Administrator"){ %>
+                                    <div class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Academic Accountability
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                              <a class="dropdown-item" href="/questions">View Questions</a>
+                                              <a class="dropdown-item" href="/questions/new">Add Questions</a>
+                                              <div class="dropdown-divider"></div>
+                                              <a class="dropdown-item" href="#">Analytics</a>
+                                              <div class="dropdown-divider"></div>
+                                              <a class="dropdown-item text-white bg-secondary" href="/activate">Activate Form!</a>
+                                            </div>
+                                        </div>
+                                        <div class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Signed In As <%= currentUser.username %>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                              <a class="dropdown-item" href="/academics">View Accounts</a>
+                                              <div class="dropdown-divider"></div>
+                                              <a class="dropdown-item" href="/register">Register Accounts</a>
+                                            </div>
+                                        </div>
+                                <% } %>
+                                <% if(currentUser.role == "Lecturer"){ %>
+                                    <div class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Academic Accountability <span class="badge"><%= notifications.length %></span></a>
+                                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                            <% var notificationCount     = 0; %>
+                                            <% if (!(notifications === undefined || notifications.length == 0)){ %>
+                                                <% notifications.forEach(function(notification){ %>
+                                                        <% notificationCount++; %>
+                                                <% }) %>
+                                            <% } %>
+                                                <% if(notificationCount == 0){ %>
+                                                    <a class="dropdown-item disabled" href="/academics/<%= currentUser.user.id %>/forms/new">Submit Form <span class="badge"><%= formNotificationCount %></span></a>
+                                                <% } else{ %>
+                                                    <a class="dropdown-item" href="/academics/<%= currentUser.user.id %>/forms/new">Submit Form <span class="badge"><%= formNotificationCount %></span></a>
+                                                    <% notifications.forEach(function(notification){ %>
+                                                        <a class="dropdown-item" href="/notifications/<%= notification._id %>">   <%= notification.text %></a>
+                                                    <% }) %>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                        <div class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Signed In As <%= currentUser.username %>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                              <a class="dropdown-item" href="/academics/<%= currentUser.user.id %>">My Account</a>  
+                                            </div>
+                                        </div>
+                                <% } %>
+                                <a class="nav-item nav-link" href="/logout">Logout</a>
+                            <% } %>
+                        </div>
+                    </div>
+            </div>
+        </nav>
+        
+        <div class="grid container">
+                <% if(error && error.length > 0){ %>
+                    <div class="alert alert-danger sixteen wide column" role="alert">
+                        <%= error %>
+                    </div>
+                <% } %>
+                <% if(success && success.length > 0){ %>
+                    <div class="alert alert-success sixteen wide column" role="alert">
+                        <%= success %>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js" type="text/javascript" async></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+        <script src="/scripts/analytics.js"></script>
+
+    <% var faculty                  = currentUser.user.faculty; %>
+    <% var academicIndex            = []; %>
+    <% var teachingData             = []; %>
+    <% var rdData                   = []; %>
+    <% var undData                  = []; %>
+    <% var departments              = []; %>
+    <% var deparmtnetScores         = []; %>
+
+    <% var totalTeachingScore       = 0; %>
+    <% var totalRdScore             = 0; %>
+    <% var totalUndScore            = 0; %>
+
+    <% var totalTeachingScoreAll    = 0; %>
+    <% var totalRdScoreAll          = 0; %>
+    <% var totalUndScoreAll         = 0; %>
+
+    <% var totalTeachingScoreOther  = 0; %>
+    <% var totalRdScoreOther        = 0; %>
+    <% var totalUndScoreOther       = 0; %>
+
+    <% var totalFacultyCount        = 0; %>
+    <% var totalOtherCount          = 0; %>
+
+    <% var pcntTeachingScore        = 0; %>
+    <% var pcntRdScore              = 0; %>
+    <% var pcntUndScore             = 0; %>
+
+    <% var semesterTeachingScore    = 0; %>
+    <% var semesterRdScore          = 0; %>
+    <% var semesterUndScore         = 0; %>
+
+    <% var semesterTeachingScoreAll = 0; %>
+    <% var semesterRdScoreAll       = 0; %>
+    <% var semesterUndScoreAll      = 0; %>   
+    
+    <% var semesterTeachingScoreOther  = 0; %>
+    <% var semesterRdScoreOther        = 0; %>
+    <% var semesterUndScoreOther       = 0; %>
+
+    <% var semesterFacultyCount     = 0; %>
+    <% var semesterOtherCount       = 0; %>
+
+    <% var lastYear; %>
+    <% var checkYear; %>
+
+    <% var pcntSemesterTeachingScore        = 0; %>
+    <% var pcntSemesterRdScore              = 0; %>
+    <% var pcntSemesterUndScore             = 0; %>
+
+    <% if(typeof fromVal !== 'undefined' && typeof toVal !== 'undefined'){ %>
+        <% checkYear     = fromVal; %>
+        <% var temp1     = toVal.substring(0, 2); %>
+        <% var temp2     = parseInt(toVal.substring(2, 4), 10); %>
+        <% var temp3     = temp2 + 1; %>
+        <% var temp4     = parseInt(toVal.substring(5, toVal.length), 10); %>
+        <% var temp5     = temp4 + 1; %>
+
+        <% var temp6     = temp1 + temp3 + "/" + temp5; %>
+        <% lastYear      = temp6.toString(); %>
+
+        <% var insertString = checkYear + " Sem 1" %>
+
+        <% do{ %>
+            <% academicIndex.push(insertString); %>
+            <% if(insertString[insertString.length - 1] == "1"){ %>
+                <% insertString = insertString.substring(0, 12) + "2"; %>
+            <% } else{ %>
+                <% var temp7     = insertString.substring(0, 2); %>
+                <% var temp8     = parseInt(insertString.substring(2, 4), 10); %>
+                <% var temp9     = temp8 + 1; %>
+                <% var temp10    = parseInt(insertString.substring(5, 7), 10); %>
+                <% var temp11    = temp10 + 1; %>
+                <% var temp12    = temp7 + temp9 + "/" + temp11; + " Sem 1"; %>
+                <% insertString  = temp12.toString(); %>
+            <% } %>
+        <% } while(insertString.substring(0, 7) !== lastYear); %>
+    <% } else{ %>
+        <% var firstYear = forms[0].academicYear.substring(2, 4); %>
+        <% var finalYear = forms[0].academicYear.substring(2, 4); %>
+        <% var check; %>
+        <% forms.forEach(function(form){ %>
+            <% check = form.academicYear.substring(2, 4); %>
+            <% if(firstYear > check){ %>
+                <% firstYear = check; %>
+            <% } %>
+            <% if(finalYear < check){ %>
+                <% finalYear = check; %>
+            <% } %>
+        <% }) %>
+        <% if(firstYear == finalYear){ %>
+            <% var temp          = parseInt(firstYear, 10) + 1; %>
+            <% var insertString  = "20" + firstYear + "/" + temp + " Sem 1"; %>
+            <% academicIndex.push(insertString); %>
+            <% insertString      = insertString.substring(0, 12) + "2"; %>
+            <% academicIndex.push(insertString); %>
+        <% } else{ %>
+            <% var temp          = parseInt(firstYear, 10) + 1; %>
+            <% var insertString  = "20" + firstYear + "/" + temp + " Sem 1"; %>
+
+            <% do{ %>
+                <% if(insertString.substring(11, 12) == "1"){ %>
+                    <% academicIndex.push(insertString); %>
+                    <% insertString = insertString.substring(0, 12) + "2"; %>
+                <% } else{ %> 
+                    <% academicIndex.push(insertString); %>
+                    <% var temp1            = parseInt(insertString.substring(2, 4), 10) + 1; %>
+                    <% var temp2            = parseInt(insertString.substring(5, 7), 10) + 1; %>
+                    <% var insertString     = insertString.substring(0, 2) + temp1 + "/" + temp2 + " Sem 1"; %>
+                <% } %>
+            <% } while(insertString.substring(2, 4) == finalYear); %>
+        <% } %>
+    <% } %>
+
+    <% academicIndex.forEach(function(index){ %>
+        <% var academicYear    = index.substring(0, 7); %>
+        <% var semester; %>
+        <% var teachingScore   = 0; %>
+        <% var rdScore         = 0; %>
+        <% var undScore        = 0; %>
+        <% if(index[index.length - 1] == '1'){ %>
+            <% semester       = "Semester 1"; %>
+        <% } else{ %>
+            <% semester        = "Semester 2"; %>
+        <% } %>
+        <% academics.forEach(function(academic){ %>
+            <% if(academic.faculty == faculty){ %>
+                <% academic.forms.forEach(function(form){ %>
+                    <% if(form.academicYear == academicYear && form.semester == semester){ %>
+                        <% teachingScore   = teachingScore + form.teachingScore; %>
+                        <% rdScore         = rdScore + form.rdScore; %>
+                        <% undScore        = undScore + form.undScore; %>
+                    <% } %>
+                <% }) %>
+            <% } %>
+        <% }) %>
+        <% teachingData.push(teachingScore); %>
+        <% rdData.push(rdScore); %>
+        <% undData.push(undScore); %>
+    <% }) %>
+
+    <% academics.forEach(function(academic){ %>
+        <% if(academic.faculty == faculty){ %>
+            <% var isAvailable     = false; %>
+            <% var department      = academic.department; %>
+            <% departments.forEach(function(departmentInArray){ %>
+                <% if(departmentInArray == department){ %>
+                    <% isAvailable = true; %>
+                <% } %>
+            <% }) %>
+            <% if(isAvailable == false){ %>
+                <% departments.push(department); %>
+            <% } %>
+        <% } %>
+    <% }) %>
+
+    <div class="ui center aligned segment ml-4 mr-4" id="segment" style="float: left; margin-top: 38px;">
+        <div class="ui huge header centered"> Department Analytics </div> 
+        <div>
+            <form action="/analytics" method="GET">
+                <% departments.forEach(function(department){ %>
+                    <br>
+                    <input type="submit" value="<%= department %>" name="departmentAnalytics" class="btn btn-link">
+                <% }) %>
+            </form>
+        </div>
+        <br>
+    </div>
+
+    <% var options = []; %>
+    <% var firstYear = forms[0].academicYear.substring(2, 4); %>
+    <% var finalYear = forms[0].academicYear.substring(2, 4); %>
+    <% var check; %>
+    <% forms.forEach(function(form){ %>
+        <% check = form.academicYear.substring(2, 4); %>
+        <% if(firstYear > check){ %>
+            <% firstYear = check; %>
+        <% } %>
+        <% if(finalYear < check){ %>
+            <% finalYear = check; %>
+        <% } %>
+    <% }) %>
+    <% if(firstYear == finalYear){ %>
+        <% var temp          = parseInt(firstYear, 10) + 1; %>
+        <% var insertString  = "20" + firstYear + "/" + temp + " Semester 1"; %>
+        <% options.push(insertString); %>
+        <% insertString      = insertString.substring(0, 17) + "2"; %>
+        <% options.push(insertString); %>
+    <% } else{ %>
+        <% var temp          = parseInt(firstYear, 10) + 1; %>
+        <% var insertString  = "20" + firstYear + "/" + temp + " Semester 1"; %>
+
+        <% do{ %>
+            <% if(insertString.substring(11, 12) == "1"){ %>
+                <% options.push(insertString); %>
+                <% insertString = insertString.substring(0, 12) + "2"; %>
+            <% } else{ %> 
+                <% academicIndex.push(insertString); %>
+                <% var temp1            = parseInt(insertString.substring(2, 4), 10) + 1; %>
+                <% var temp2            = parseInt(insertString.substring(5, 7), 10) + 1; %>
+                <% var insertString     = insertString.substring(0, 2) + temp1 + "/" + temp2 + " Semester 1"; %>
+            <% } %>
+        <% } while(insertString.substring(2, 4) == finalYear); %>
+    <% } %>
+
+    <div class="container">
+            <div class="row">
+                    <div class="col-6">
+                            <div class="d-flex justify-content-end">
+                                <form action="/analytics" method="GET" id="overallForm" class="form-inline my-2 my-lg-0">
+                                    <div class="form-group mr-2">
+                                        <select class="form-control" name="from" id="from">
+                                            <option value="" hidden>From</option>
+                                            <% options.forEach(function(option){ %>
+                                                <% if(option.substring(17, 18) == "1"){ %>
+                                                    <% console.log("hello") %>
+                                                    <option value="<%= option.substring(0, 7) %>"><%= option.substring(0, 7) %></option>
+                                                <% } %>
+                                            <% }) %>
+                                        </select>
+                                    </div>
+                                    <div class="form-group mr-2">
+                                        <select class="form-control" name="to" id="to">
+                                            <option value="" hidden>To&nbsp;&nbsp;&nbsp;</option>
+                                            <% options.forEach(function(option){ %>
+                                                <% if(option.substring(17, 18) == "1"){ %>
+                                                    <option value="<%= option.substring(0, 7) %>"><%= option.substring(0, 7) %></option>
+                                                <% } %>
+                                            <% }) %>
+                                        </select>
+                                    </div>
+                                    <input type="submit" value="Go" class="btn btn-secondary"/>
+                            </div>
+                    </div>
+                    <div class="col-6">
+                            <div class="d-flex justify-content-end">
+                                    <div class="form-group mr-2">
+                                        <select class="form-control" name="for" id="for">
+                                            <option value="" hidden>For&nbsp;&nbsp;</option>
+                                            <% options.forEach(function(option){ %>
+                                                <option value="<%= option %>"><%= option %></option>
+                                            <% }) %>
+                                        </select>
+                                    </div>
+                                    <input type="submit" value="Go" class="btn btn-secondary" style="height: 33px;"/>
+                                </form>
+                            </div>
+                    </div>
+                </div>
+        <div class="row">
+            <div class="col-6">
+                <div class="d-flex justify-content-between mb-2">
+                    <h1 class="text-left-right">
+                        <span class="left-text">Overall</span>
+                        <span class="byline">Summary</span>
+                    </h1>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Department</th>
+                            <th scope="col">Teaching</th>
+                            <th scope="col">R&D</th>
+                            <th scope="col">U&ND</th>
+                            <th scope="col">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% departments.forEach(function(department){ %>
+                            <% totalTeachingScore   = 0; %>
+                            <% totalRdScore         = 0; %>
+                            <% totalUndScore        = 0; %>
+                            <% academics.forEach(function(academic){ %>
+                                <% if(academic.faculty == faculty && academic.department == department){ %>
+                                    <% academic.forms.forEach(function(form){ %>
+                                        <% if(form.isApproved == true){ %>
+                                            <% var count            = academic.forms.length; %>
+                                            <% if(typeof fromVal !== 'undefined' && typeof toVal !== 'undefined'){ %>
+                                                <% totalFacultyCount++; %>
+        
+                                                <% do{ %>
+                                                    <% if(form.academicYear == checkYear){ %>
+                                                        <% totalTeachingScore  = totalTeachingScore + form.teachingScore; %>
+                                                        <% totalRdScore        = totalRdScore + form.rdScore; %>
+                                                        <% totalUndScore       = totalUndScore + form.undScore; %>
+                                                        <% break; %>
+                                                    <% } %>
+        
+                                                    <% var temp7     = checkYear.substring(0, 2); %>
+                                                    <% var temp8     = parseInt(checkYear.substring(2, 4), 10); %>
+                                                    <% var temp9     = temp8 + 1; %>
+                                                    <% var temp10    = parseInt(checkYear.substring(5, checkYear.length), 10); %>
+                                                    <% var temp11    = temp10 + 1; %>
+                                                    
+                                                    <% var temp12    = temp7 + temp9 + "/" + temp11; %>
+                                                    <% checkYear     = temp12.toString(); %>
+                                                <% } while(checkYear !== lastYear); %>
+                                                
+                                            <% } else{ %>
+                                                <% totalFacultyCount++; %>
+                                                <% totalTeachingScore  = totalTeachingScore + form.teachingScore; %>
+                                                <% totalRdScore        = totalRdScore + form.rdScore; %>
+                                                <% totalUndScore       = totalUndScore + form.undScore; %>
+                                            <% } %>
+                                        <% } %>
+                                    <% }) %>
+                                <% } %>
+                            <% }) %>
+                            <% totalTeachingScoreAll   = totalTeachingScoreAll + totalTeachingScore; %>
+                            <% totalRdScoreAll         = totalRdScoreAll + totalRdScore; %>
+                            <% totalUndScoreAll        = totalUndScoreAll + totalUndScore; %>
+                            <tr>
+                                <th scope="row"><%= department %></th>
+                                <td><%= totalTeachingScore %></td>
+                                <td><%= totalRdScore %></td>
+                                <td><%= totalUndScore %></td>
+                                <td><%= totalTeachingScore + totalRdScore + totalUndScore %></td>
+                            </tr>
+                        <% }) %>
+
+                        <% academics.forEach(function(academic){ %>
+                            <% if(academic.faculty !== faculty){ %>
+                                <% academic.forms.forEach(function(form){ %>
+                                    <% if(form.isApproved == true){ %>
+                                        <% if(typeof fromVal !== 'undefined' && typeof toVal !== 'undefined'){ %>
+                                            <% totalOtherCount++; %>
+
+                                            <% do{ %>
+                                                <% if(form.academicYear == checkYear){ %>
+                                                    <% totalTeachingScoreOther  = totalTeachingScoreOther + form.teachingScore; %>
+                                                    <% totalRdScoreOther        = totalRdScoreOther + form.rdScore; %>
+                                                    <% totalUndScoreOther       = totalUndScoreOther + form.undScore; %>
+                                                    <% break; %>
+                                                <% } %>
+
+                                                <% var temp7     = checkYear.substring(0, 2); %>
+                                                <% var temp8     = parseInt(checkYear.substring(2, 4), 10); %>
+                                                <% var temp9     = temp8 + 1; %>
+                                                <% var temp10    = parseInt(checkYear.substring(5, checkYear.length), 10); %>
+                                                <% var temp11    = temp10 + 1; %>
+                                                
+                                                <% var temp12    = temp7 + temp9 + "/" + temp11; %>
+                                                <% checkYear     = temp12.toString(); %>
+                                            <% } while(checkYear !== lastYear); %>
+                                            <% } else{ %>
+                                                <% totalOtherCount++; %>
+                                                <% totalTeachingScoreOther  = totalTeachingScoreOther + form.teachingScore; %>
+                                                <% totalRdScoreOther        = totalRdScoreOther + form.rdScore; %>
+                                                <% totalUndScoreOther       = totalUndScoreOther + form.undScore; %>
+                                            <% } %>
+                                    <% } %>
+                                <% }) %>
+                            <% } %>
+                        <% }) %>
+
+                        <% pcntTeachingScore                 = (((totalTeachingScoreAll/totalFacultyCount) / ((totalTeachingScoreAll + totalTeachingScoreOther)/(totalFacultyCount + totalOtherCount))) * 100); %>
+                        <% pcntRdScore                       = (((totalRdScoreAll/totalFacultyCount) / ((totalRdScoreAll + totalRdScoreOther)/(totalFacultyCount + totalOtherCount))) * 100); %>
+                        <% pcntUndScore                      = (((totalUndScoreAll/totalFacultyCount) / ((totalUndScoreAll + totalUndScoreOther)/(totalFacultyCount + totalOtherCount))) * 100); %>  
+                    </tbody>
+                </table>
+
+                <div class="d-flex justify-content-between mb-2">
+                        <h1 class="text-left-right">
+                            <span class="left-text">Overall</span>
+                            <span class="byline">Research Summary</span>
+                        </h1>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Department</th>
+                                <th scope="col">Author</th>
+                                <th scope="col">Research Title</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% academics.forEach(function(academic){ %>
+                                <% if(academic.faculty == faculty){ %>
+                                    <% var publicationArray = []; %>
+                                    <% academic.forms.forEach(function(form){ %>
+                                        <% if(form.isApproved == true){ %>
+                                            <% if(typeof fromVal !== 'undefined' && typeof toVal !== 'undefined'){ %>
+                                                <% checkYear = fromVal; %>
+                                                <% do{ %>
+                                                    <% if(form.academicYear == checkYear){ %>
+                                                        <% form.answers[1].answerTexts.forEach(function(publication){ %>
+                                                            <% publicationArray.push(publication); %>
+                                                        <% }) %>
+                                                        <% break; %>
+                                                    <% } %>
+        
+                                                    <% var temp7     = checkYear.substring(0, 2); %>
+                                                    <% var temp8     = parseInt(checkYear.substring(2, 4), 10); %>
+                                                    <% var temp9     = temp8 + 1; %>
+                                                    <% var temp10    = parseInt(checkYear.substring(5, checkYear.length), 10); %>
+                                                    <% var temp11    = temp10 + 1; %>
+                                                    
+                                                    <% var temp12    = temp7 + temp9 + "/" + temp11; %>
+                                                    <% checkYear     = temp12.toString(); %>
+                                                <% } while(checkYear !== lastYear); %>
+                                            <% } else{ %>
+                                                <% form.answers[1].answerTexts.forEach(function(publication){ %>
+                                                    <% publicationArray.push(publication); %>
+                                                <% }) %>
+                                            <% } %>
+                                        <% } %>
+                                    <% }) %>
+                                    <tr>
+                                        <th><%= academic.department %></th>
+                                        <td scope="row"><%= academic.prefix %> <%= academic.firstName %> <%= academic.secondName %></td>
+                                        <td>
+                                            <% publicationArray.forEach(function(publication){ %>
+                                                <%= publication %> <br>
+                                            <% }) %>
+                                        </td>
+                                    </tr>
+                                <% } %>
+                            <% }) %>
+                        </tbody>
+                    </table>
+            </div>
+            <div class="col-6">
+                <div class="d-flex justify-content-between mb-2">
+                    <h1 class="text-left-right">
+                        <span class="left-text">Semester</span>
+                        <span class="byline">Summary</span>
+                    </h1>
+                </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Department</th>
+                                <th scope="col">R&D</th>
+                                <th scope="col">U&ND</th>
+                                <th scope="col">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% departments.forEach(function(department){ %>
+                                <% semesterTeachingScore    = 0; %>
+                                <% semesterRdScore          = 0; %>
+                                <% semesterUndScore         = 0; %>
+                                <% academics.forEach(function(academic){ %>
+                                    <% if(academic.faculty == faculty && academic.department == department){ %>
+                                        <% var count        = academic.forms.length; %>
+                                        <% academic.forms.forEach(function(form){ %>
+                                            <% if(form.isApproved == true){ %>
+                                                <% if(typeof forVal !== 'undefined'){ %>
+                                                    <% semesterFacultyCount++; %>
+                                                    <% var checkSemester = form.academicYear + " " + form.semester; %>
+                                                    <% if(forVal == checkSemester){ %>
+                                                        <% semesterTeachingScore    = form.teachingScore; %>
+                                                        <% semesterRdScore          = form.rdScore; %>
+                                                        <% semesterUndScore         = form.undScore; %>
+                                                    <% } %>
+                                                <% } else{ %>
+                                                    <% count--; %>
+                                                    <% if(count == 0){ %>
+                                                        <% semesterFacultyCount++; %>
+                                                        <% semesterTeachingScore    = form.teachingScore; %>
+                                                        <% semesterRdScore          = form.rdScore; %>
+                                                        <% semesterUndScore         = form.undScore; %>
+                                                    <% } %>
+                                                <% } %>
+                                            <% } %>
+                                        <% }) %> 
+                                    <% } %>
+                                <% }) %>
+                                <% semesterTeachingScoreAll   = semesterTeachingScoreAll + semesterTeachingScore; %>
+                                <% semesterRdScoreAll         = semesterRdScoreAll + semesterRdScore; %>
+                                <% semesterUndScoreAll        = semesterUndScoreAll + semesterUndScore; %>                               
+                                <tr>
+                                    <th scope="row"><%= department %></th>
+                                    <td><%= semesterTeachingScore %></td>
+                                    <td><%= semesterRdScore %></td>
+                                    <td><%= semesterUndScore %></td>
+                                    <td><%= semesterTeachingScore + semesterRdScore + semesterUndScore %></td>
+                                </tr>
+                            <% }) %>
+
+                            <% academics.forEach(function(academic){ %>
+                                <% if(academic.faculty !== faculty){ %>
+                                    <% academic.forms.forEach(function(form){ %>
+                                        <% if(form.isApproved == true){ %>
+                                            <% if(typeof forVal !== 'undefined'){ %>
+                                                <% semesterOtherCount++; %>
+                                                <% var checkSemester = form.academicYear + " " + form.semester; %>
+                                                <% if(forVal == checkSemester){ %>
+                                                    <% semesterTeachingScoreOther    = form.teachingScore; %>
+                                                    <% semesterRdScoreOther          = form.rdScore; %>
+                                                    <% semesterUndScoreOther         = form.undScore; %>
+                                                <% } %>
+                                            <% } else{ %>
+                                                <% count--; %>
+                                                <% if(count == 0){ %>
+                                                    <% semesterOtherCount++; %>
+                                                    <% semesterTeachingScoreother    = form.teachingScore; %>
+                                                    <% semesterRdScoreOther          = form.rdScore; %>
+                                                    <% semesterUndScoreOther         = form.undScore; %>
+                                                <% } %>
+                                            <% } %>
+                                        <% } %>
+                                    <% }) %>
+                                <% } %>
+                            <% }) %>
+
+                            <% pcntSemesterTeachingScore                 = (((semesterTeachingScoreAll/semesterFacultyCount) / ((semesterTeachingScoreAll + semesterTeachingScoreOther)/(semesterFacultyCount + semesterOtherCount))) * 100); %>
+                            <% pcntSemesterRdScore                       = (((semesterRdScoreAll/semesterFacultyCount) / ((semesterRdScoreAll + semesterRdScoreOther)/(semesterFacultyCount + semesterOtherCount))) * 100); %>
+                            <% pcntSemesterUndScore                      = (((semesterUndScoreAll/semesterFacultyCount) / ((semesterUndScoreAll + semesterUndScoreOther)/(semesterFacultyCount + semesterOtherCount))) * 100); %>
+                        </tbody>
+                    </table>
+
+                    <div class="d-flex justify-content-between mb-2">
+                            <h1 class="text-left-right">
+                                <span class="left-text">Semester</span>
+                                <span class="byline">Research Summary</span>
+                            </h1>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Department</th>
+                                    <th scope="col">Author</th>
+                                    <th scope="col">Research Title</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% academics.forEach(function(academic){ %>
+                                    <% if(academic.faculty == faculty){ %>
+                                        <% var publicationArray = []; %>
+                                        <% var count                    = academic.forms.length; %>
+    
+                                        <% academic.forms.forEach(function(form){ %>
+                                            <% if(form.isApproved == true){ %>
+                                                <% if(typeof forVal !== 'undefined'){ %>
+                                                    <% var checkSemester = form.academicYear + " " + form.semester; %>
+                                                    <% if(forVal == checkSemester){ %>
+                                                        <% form.answers[1].answerTexts.forEach(function(publication){ %>
+                                                            <% publicationArray.push(publication); %>
+                                                        <% }) %>
+                                                    <% } %>
+                                                <% } else{ %>
+                                                    <% count--; %>
+                                                    <% if(count == 0){ %>
+                                                        <% form.answers[1].answerTexts.forEach(function(publication){ %>
+                                                            <% publicationArray.push(publication); %>
+                                                        <% }) %>
+                                                    <% } %>
+                                                <% } %>
+                                            <% } %>
+                                        <% }) %>
+                                        <tr>
+                                            <th><%= academic.department %></th>
+                                            <td scope="row"><%= academic.prefix %> <%= academic.firstName %> <%= academic.secondName %></td>
+                                            <td>
+                                                <% publicationArray.forEach(function(publication){ %>
+                                                    <%= publication %> <br>
+                                                <% }) %>
+                                            </td>
+                                        </tr>
+                                    <% } %>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <h1 class="text-left-right">
+                    <span class="left-text">Overall</span>
+                    <span class="byline">Composition</span>
+                </h1>
+                <canvas id="overallDoughnutChart"></canvas>
+            </div>
+            <div class="col-6">
+                <h1 class="text-left-right">
+                    <span class="left-text">Semester</span>
+                    <span class="byline">Composition</span>
+                </h1>
+                <canvas id="semesterDoughnutChart"></canvas>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-6">
+                <h1 class="text-left-right">
+                    <span class="left-text">Overall</span>
+                    <span class="byline">Mean Comparison</span>
+                    <h5 style="font-size: 12px;" class="card-title">Teaching</h5>
+                    <div id="totalTeachingBar" class="bar teaching">
+                        <div></div>
+                    </div>
+                    <h5 style="font-size: 12px;" class="card-title">R&D</h5>
+                    <div id="totalRdBar" class="bar rd">
+                        <div></div>
+                    </div>
+                    <h5 style="font-size: 12px;" class="card-title">U&ND</h5>
+                    <div id="totalUndBar" class="bar und">
+                        <div></div>
+                    </div>
+                </h1>
+            </div>
+            <div class="col-6">
+                <h1 class="text-left-right">
+                    <span class="left-text">Semester</span>
+                    <span class="byline">Mean Comparison</span>
+                    <h5 style="font-size: 12px;" class="card-title">Teaching</h5>
+                    <div id="semesterTeachingBar" class="bar teaching">
+                        <div></div>
+                    </div>
+                    <h5 style="font-size: 12px;" class="card-title">R&D</h5>
+                    <div id="semesterRdBar" class="bar rd">
+                        <div></div>
+                    </div>
+                    <h5 style="font-size: 12px;" class="card-title">U&ND</h5>
+                    <div id="semesterUndBar" class="bar und">
+                        <div></div>
+                    </div>
+                </h1>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-12 mb-4">
+                <h1 class="text-left-right">
+                    <span class="left-text">Trend</span>
+                    <span class="byline">Analysis</span>
+                </h1>
+                <canvas id="teachingBarChart"></canvas>
+            </div>
+        </div>
+        <div class="row">
+                <div class="col-12 mb-4">
+                    <canvas id="r&dBarChart"></canvas>
+                </div>
+        </div>
+        <div class="row">
+                <div class="col-12">
+                    <canvas id="u&ndBarChart"></canvas>
+                </div>
+        </div>
+    </div>
+
+<script>
+    var totalTeachingScoreAll         = "<%= totalTeachingScoreAll %>";
+    var totalRdScoreAll               = "<%= totalRdScoreAll %>";
+    var totalUndScoreAll              = "<%= totalUndScoreAll %>";
+
+    var semesterTeachingScoreAll      = "<%= semesterTeachingScoreAll %>";
+    var semesterRdScoreAll            = "<%= semesterRdScoreAll %>";
+    var semesterUndScoreAll           = "<%= semesterUndScoreAll %>";
+
+    var pcntTeachingScore             = '<%= pcntTeachingScore %>';
+    var pcntRdScore                   = '<%= pcntRdScore %>';
+    var pcntUndScore                  = '<%= pcntUndScore %>';
+
+    var pcntSemesterTeachingScore     = '<%= pcntSemesterTeachingScore %>';
+    var pcntSemesterRdScore           = '<%= pcntSemesterRdScore %>';
+    var pcntSemesterUndScore          = '<%= pcntSemesterUndScore %>';
+
+    var academicIndex                 = '<%= academicIndex %>';
+    var teachingData                  = '<%= teachingData %>';
+    var rdData                        = '<%= rdData %>';
+    var undData                       = '<%= undData %>';
+
+        var ctx = document.getElementById('overallDoughnutChart').getContext('2d');
+        var totalDoughnutChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Teaching', 'R&D', 'U&ND'],
+                datasets: [{
+                    label: 'My First dataset',
+                    backgroundColor: ['#17a2b8', '#6c757d', '#ffc107'],
+                    borderColor: ['#17a2b8', '#6c757d', '#ffc107'],
+                    data: [totalTeachingScoreAll, totalRdScoreAll, totalUndScoreAll]
+                }]
+            },
+            options: {
+                layout: {
+                    padding: {
+                        left: 0,
+                        right: 0,
+                        top: 0,
+                        bottom: 10
+                    }
+                }
+            }
+        });
+
+        var ctx = document.getElementById('semesterDoughnutChart').getContext('2d');
+        var semesterDoughnutChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Teaching', 'R&D', 'U&ND'],
+                datasets: [{
+                    label: 'My First dataset',
+                    backgroundColor: ['#17a2b8', '#6c757d', '#ffc107'],
+                    borderColor: ['#17a2b8', '#6c757d', '#ffc107'],
+                    data: [semesterTeachingScoreAll, semesterRdScoreAll, semesterUndScoreAll]
+                }]
+            },
+            options: {
+                layout: {
+                    padding: {
+                        left: 0,
+                        right: 0,
+                        top: 0,
+                        bottom: 10
+                    }
+                }
+            }
+        });
+ 
+
+        var labels = academicIndex.split(',');
+        var ctx = document.getElementById('teachingBarChart');
+        var progressBarChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Teaching',
+                    backgroundColor: '#17a2b8',
+                    borderColor: '#17a2b8',
+                    data: teachingData.split(',')
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        id:'main-axis',
+                            ticks: {
+                                stepSize: 5
+                            }
+                    }]
+                }
+            }
+        });
+
+        var labels = academicIndex.split(',');
+        var ctx = document.getElementById('r&dBarChart');
+        var progressBarChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Research & Development',
+                    backgroundColor: '#6c757d',
+                    borderColor: '#6c757d',
+                    data: rdData.split(',')
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        id:'main-axis',
+                            ticks: {
+                                stepSize: 5
+                            }
+                    }]
+                }
+            }
+        });
+
+        var labels = academicIndex.split(',');
+        var ctx = document.getElementById('u&ndBarChart');
+        var progressBarChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'University & National Development',
+                    backgroundColor: '#ffc107',
+                    borderColor: '#ffc107',
+                    data: undData.split(',')
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        id:'main-axis',
+                            ticks: {
+                                stepSize: 5
+                            }
+                    }]
+                }
+            }
+        });
+
+    function changePercentage(elem, perc) {
+        var $div = $(elem).find('div');
+        $div.text(perc + '%');
+        $div.css('width', perc + '%');
+    }
+
+    changePercentage('#totalTeachingBar', pcntTeachingScore);
+    changePercentage('#totalRdBar', pcntRdScore);
+    changePercentage('#totalUndBar', pcntUndScore);
+
+    changePercentage('#semesterTeachingBar', pcntSemesterTeachingScore);
+    changePercentage('#semesterRdBar', pcntSemesterRdScore);
+    changePercentage('#semesterUndBar', pcntSemesterUndScore);
+</script>
+
+<% include ./partials/footer.ejs %>    

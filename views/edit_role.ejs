@@ -1,0 +1,30 @@
+<% include ./partials/header.ejs %>
+
+<div class="ui main text container segment">
+        <div class="ui huge header">Edit Role</div>
+        <form action="/role" enctype="multipart/form-data" method="POST" class="ui form">
+            <div class="field">
+                <label for="username">Username</label>
+                <select class="ui search dropdown" name="role" id="role">
+                    <option value="" hidden>Username</option>
+                    <% auths.forEach(function(auth){ %>
+                        <option value="<%= auth.username %>"><%= auth.username %></option>
+                    <% }) %> 
+                </select>
+            </div>
+            <div class="field">
+                <label for="role">Role</label>
+                <select class="ui search dropdown" name="role" id="role">
+                    <option value="" hidden>Role</option>
+                    <option value="Administrator">Administrator</option>
+                    <option value="Dean">Dean</option>
+                    <option value="Head of Department">Head of Department</option>
+                    <option value="Lecturer">Lecturer</option>    
+                </select>
+            </div>
+            <input style="width: 100%; font-family: Lato,Helvetica;" type="submit" class="btn btn-secondary btn-lg" value="EDIT ROLE"> 
+        </form>
+    </div>
+
+<% include ./partials/footer.ejs %>
+

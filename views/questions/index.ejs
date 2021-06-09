@@ -1,0 +1,43 @@
+<% include ../partials/header.ejs %> 
+
+<div class="ui main text container">
+    <div class="ui top attached segment" id="segment">
+        <div class="ui divided items">
+                <% questions.forEach(function(question){ %>
+                        <div class="item">
+                            <div class="content" style="font-size: medium">
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-10">
+                                                <p style="font-family: Lato, Helvetica; font-size: 23px; color: black;"><strong> <%= question.questionText %> </strong></p>   
+                                                <div class="description">
+                                                    <p> <strong>Pillar</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : <%= question.pillar %> </p>
+                                                    <p><strong>Multiplier</strong> &nbsp;&nbsp;   : <%= question.multiplier %> </p>
+                                                    <% if(question.options.length > 1){ %>
+                                                        <p> <strong>Options &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong>:</p>
+                                                        <% question.options.forEach(function(option){ %>
+                                                            <ul> <%= option.optionText %> - <%= option.weight %></ul>
+                                                        <% }) %>
+                                                    <% } else{ %>
+                                                        <p><strong>Weight</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <%= question.options[0].weight %></p>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                        <div class="col-2">
+                                            <div style="text-align: right;">
+                                                <a href="/questions/<%= question._id %>/edit" style="color: black;" class="mr-0"><i class="fa fa-edit"></i></a>
+                                                <form action="/questions/<%= question._id %>?_method=DELETE" method="POST" style="display: inline;">
+                                                    <button class="btn" style=" display:inline-block;"><i class="fa fa-trash"></i></button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>              
+                        </div>
+                <% }); %>
+        </div>
+    </div>
+</div>
+    
+<% include ../partials/footer.ejs %>

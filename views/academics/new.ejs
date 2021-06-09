@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Academic Accountability System</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">     
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                        <img src="/images/AAS_Logo.svg" style="height: 100%; width: 100%;">
+                </a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                        <div class="navbar-nav ml-auto" style="font-size: medium; font-family:  Lato, Helvetica;">
+                            <a class="nav-item nav-link active" href="/">Home <span class="sr-only">(current)</span></a> 
+                            <% if(!currentUser){ %>
+                                <a class="nav-item nav-link" href="/login">Login</a>
+                            <% } else{ %>
+                                <% if(currentUser.role == "Head of Department" | currentUser.role == "Dean"){ %>
+                                    <div class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Academic Accountability <span class="badge"><%= notifications.length %></span></a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                        <% var approvalNotificationCount = 0; %>
+                                        <% var formNotificationCount     = 0; %>
+                                        <% if (!(notifications === undefined || notifications.length == 0)){ %>
+                                            <% notifications.forEach(function(notification){ %>
+                                                <% if(notification.type == "Approval" && notification.isRead == false){ %>
+                                                    <% approvalNotificationCount++; %>
+                                                <% } if(notification.type == "Form" && notification.isRead == false){ %>
+                                                    <% formNotificationCount++; %>
+                                                <% } %>
+                                            <% }) %>
+                                        <% } %> 
+                                            <% if(formNotificationCount == 0){ %>
+                                                <a class="dropdown-item disabled" href="#">Submit Form <span class="badge"><%= formNotificationCount %></span></a>
+                                            <% } else{ %>
+                                                <a class="dropdown-item disabled" href="#">Submit Form <span class="badge"><%= formNotificationCount %></span></a>
+                                                <% notifications.forEach(function(notification){ %>
+                                                    <% if(notification.type == "Form" && notification.isRead == false){ %>
+                                                        <a class="dropdown-item" href="notifications/<%= notification._id %>">   <%= notification.text %></a>
+                                                    <% } %>
+                                                <% }) %>
+                                            <% } %>
+                                            
+                                            <% if(approvalNotificationCount == 0){ %>
+                                                <a class="dropdown-item disabled" href="#">View Submissions <span class="badge"><%= approvalNotificationCount %></span></a>
+                                            <% } else{ %>
+                                                <a class="dropdown-item disabled" href="#">View Submissions <span class="badge"><%= approvalNotificationCount %></span></a>
+                                                <% notifications.forEach(function(notification){ %>
+                                                    <% if(notification.type == "Approval" && notification.isRead == false){ %>
+                                                        <a class="dropdown-item" href="/notifications/<%= notification._id %>">   <%= notification.text %></a>
+                                                    <% } %>
+                                                <% }) %>
+                                            <% } %>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item" href="#">Analytics</a>
+                                        </div>
+                                    </div>
+                                    <div class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Signed In As <%= currentUser.username %>
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                          <a class="dropdown-item" href="/academics/<%= currentUser.user.id %>">My Account</a>
+                                          <div class="dropdown-divider"></div>
+                                          <a class="dropdown-item" href="/academics">View Accounts</a>
+                                        </div>
+                                    </div>
+                                <% } %>
+                                <% if(currentUser.role == "Administrator"){ %>
+                                    <div class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Academic Accountability
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                              <a class="dropdown-item" href="/questions">View Questions</a>
+                                              <a class="dropdown-item" href="/questions/new">Add Questions</a>
+                                              <div class="dropdown-divider"></div>
+                                              <a class="dropdown-item" href="#">Analytics</a>
+                                              <div class="dropdown-divider"></div>
+                                              <a class="dropdown-item text-white bg-secondary" href="/activate">Activate Form!</a>
+                                            </div>
+                                        </div>
+                                        <div class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Signed In As <%= currentUser.username %>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                              <a class="dropdown-item" href="/academics">View Accounts</a>
+                                              <div class="dropdown-divider"></div>
+                                              <a class="dropdown-item" href="/register">Register Accounts</a>
+                                            </div>
+                                        </div>
+                                <% } %>
+                                <% if(currentUser.role == "Lecturer"){ %>
+                                    <div class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Academic Accountability <span class="badge"><%= notifications.length %></span></a>
+                                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                            <% var notificationCount     = 0; %>
+                                            <% if (!(notifications === undefined || notifications.length == 0)){ %>
+                                                <% notifications.forEach(function(notification){ %>
+                                                        <% notificationCount++; %>
+                                                <% }) %>
+                                            <% } %>
+                                                <% if(notificationCount == 0){ %>
+                                                    <a class="dropdown-item disabled" href="/academics/<%= currentUser.user.id %>/forms/new">Submit Form <span class="badge"><%= formNotificationCount %></span></a>
+                                                <% } else{ %>
+                                                    <a class="dropdown-item" href="/academics/<%= currentUser.user.id %>/forms/new">Submit Form <span class="badge"><%= formNotificationCount %></span></a>
+                                                    <% notifications.forEach(function(notification){ %>
+                                                        <a class="dropdown-item" href="/notifications/<%= notification._id %>">   <%= notification.text %></a>
+                                                    <% }) %>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                        <div class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Signed In As <%= currentUser.username %>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                              <a class="dropdown-item" href="/academics/<%= currentUser.user.id %>">My Account</a>  
+                                            </div>
+                                        </div>
+                                <% } %>
+                                <a class="nav-item nav-link" href="/logout">Logout</a>
+                            <% } %>
+                        </div>
+                    </div>
+            </div>
+        </nav>
+        
+        <div class="grid container">
+                <% if(error && error.length > 0){ %>
+                    <div class="alert alert-danger sixteen wide column" role="alert">
+                        <%= error %>
+                    </div>
+                <% } %>
+                <% if(success && success.length > 0){ %>
+                    <div class="alert alert-success sixteen wide column" role="alert">
+                        <%= success %>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js" type="text/javascript" async></script>
+        <script src="/scripts/new_academic.js"></script>
+<div class="ui main text container segment">
+        <div class="ui huge header">Create Account</div>
+        <form action="/academics" enctype="multipart/form-data" method="POST" class="ui form">
+            <div class="field">
+                    <label for="profilePicture">Profile Picture</label>
+                    <input type="file" name="profilePicture" placeholder="Profile Picture" class="inputfile">
+            </div>
+            
+            <div class="field">
+                <label for="prefix">Prefix</label>
+                <select class="ui search dropdown" name="prefix" id="prefix">
+                    <option value="" hidden>Prefix</option>
+                    <option value="Ms">Ms</option>
+                    <option value="Mr">Mr</option>
+                    <option value="Mrs">Mrs</option>
+                    <option value="Dr">Dr</option>
+                    <option value="Prof">Prof</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="firstName">First Name</label>
+                <input type="text" name="firstName" placeholder="First Name" required>
+            </div>
+    
+            <div class="field">
+                <label for="secondName">Second Name</label>
+                <input type="text" name="secondName" placeholder="Second Name" required>
+            </div>
+
+            <div class="field">
+                    <label for="emailAddress">Email Address</label>
+                    <input type="email" name="emailAddress" placeholder="Email Address" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
+            </div>    
+            
+            <div class="field">
+                <label for="telephoneNumber">Telephone Number</label>
+                <input type="tel" name="telephoneNumber" placeholder="Telephone Number" pattern="[0-9]{10}">
+            </div> 
+
+            <div class="field">
+                    <label for="jobTitle">Job Title</label>
+                    <input type="text" name="jobTitle" placeholder="Job Title">
+            </div>
+            
+            <div class="field">
+                <label for="faculty">Faculty</label>
+                <select class="ui search dropdown" name="faculty" id="faculty" required>
+                    <option value="" hidden>Faculty</option>
+                    <option value="Faculty of Commerce & Management Studies">Faculty of Commerce & Management Studies</option>
+                    <option value="Faculty of Computing & Technology">Faculty of Computing & Technology</option>
+                    <option value="Faculty of Graduate Studies">Faculty of Graduate Studies</option>
+                    <option value="Faculty of Humanities">Faculty of Humanities</option>
+                    <option value="Faculty of Medicine">Faculty of Medicine</option>
+                    <option value="Faculty of Science">Faculty of Science</option>
+                    <option value="Faculty of Social Sciences">Faculty of Social Sciences</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="department">Department</label>
+                <select class="ui search dropdown" name="department" id="department" required>
+                    <option value="" hidden>Department</option>
+                </select>
+            </div>
+            
+            <input style="width: 100%; font-family: Lato, Helvetica;" type="submit" class="btn btn-secondary btn-lg" value="CREATE ACCOUNT"> 
+        </form>
+    </div>
+
+<% include ../partials/footer.ejs %>

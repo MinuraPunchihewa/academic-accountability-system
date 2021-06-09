@@ -1,0 +1,57 @@
+<% include ../partials/header.ejs %>         
+
+<div class="ui main text container segment">
+        <div class="ui huge header">Submission By: <%= academic.prefix %> <%= academic.firstName %> <%= academic.secondName %></div>
+        <form action="/academics/<%= academic._id %>/forms/<%= form._id %>?_method=PUT" enctype="multipart/form-data" method="POST" class="ui form">
+            <div class="field">
+                <label for="academicYear">Academic Year:</label>
+                <p><%= form.academicYear %></p>
+            </div>
+            <div class="field">
+                <label for="semester">Semester:</label>
+                <p><%= form.semester %></p>
+            </div>
+            <br>
+
+            <% var count = 1; %>
+            <% questions.forEach(function(question){ %>
+                <% if(question.multiplier == "Yes/No"){ %>
+                    <div class="field">
+                        <label style="font-size: medium;"><%= count %> . <%= question.questionText %></label>
+                        <% if(form.answers[count - 1].answerTexts[count - 1] == "Yes"){ %>
+                            <input type="radio" name="optionAnswerTextArr[]" id="yes" value="Yes" required style="display: inline;" disabled checked>
+                            <label style="display: inline;" for="yes" class="pr-5">Yes</label>       
+                            <div class="mb-1"></div>    
+                            <input type="radio" name="optionAnswerTextArr[]" id="yes" value="No" required style="display: inline;" disabled>
+                            <label style="display: inline;" for="no" class="pr-5">No</label>
+                        <% } else{ %>
+                            <input type="radio" name="optionAnswerTextArr[]" id="yes" value="Yes" required style="display: inline;" disabled>
+                            <label style="display: inline;" for="yes" class="pr-5">Yes</label>       
+                            <div class="mb-1"></div>    
+                            <input type="radio" name="optionAnswerTextArr[]" id="yes" value="No" required style="display: inline;" disabled checked>
+                            <label style="display: inline;" for="no" class="pr-5">No</label>
+                        <% } %>
+                    </div>
+                    <% count++; %>
+                <% } else{ %>
+                    <div class="field">
+                        <label for="answerTextArr[]" style="font-size: medium;"><%= count %>. <%= question.questionText %></label>
+                        <p>
+                            <% form.answers[count - 1].answerTexts.forEach(function(answerText){ %>
+                                <%= answerText %> <br>
+                            <% }) %>
+                        </p>
+                    </div>
+                    <% count++; %>
+                <% } %>
+            <% }) %>
+            <div class="d-flex justify-content-around">
+                <input style="width: 40%; font-family: Lato, Helvetica;" type="submit" name="submitButton" class="btn btn-secondary btn-lg" value="APPROVE"> 
+                <input style="width: 40%; font-family: Lato, Helvetica;" type="submit" name="submitButton" class="btn btn-secondary btn-lg" value="REJECT">
+            </div>
+        </form>
+</div>
+
+<% include ../partials/footer.ejs %>
+
+

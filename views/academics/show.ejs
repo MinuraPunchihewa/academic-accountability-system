@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Academic Accountability System</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+        <link rel="stylesheet" type="text/css" href="/stylesheets/show.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                        <img src="/images/AAS_Logo.svg" style="height: 100%; width: 100%;">
+                </a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                        <div class="navbar-nav ml-auto" style="font-size: medium; font-family:  Lato, Helvetica;">
+                            <a class="nav-item nav-link active" href="/">Home <span class="sr-only">(current)</span></a> 
+                            <% if(!currentUser){ %>
+                                <a class="nav-item nav-link" href="/login">Login</a>
+                            <% } else{ %>
+                                <% if(currentUser.role == "Head of Department" | currentUser.role == "Dean"){ %>
+                                    <div class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Academic Accountability <span class="badge"><%= notifications.length %></span></a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                        <% var approvalNotificationCount = 0; %>
+                                        <% var formNotificationCount     = 0; %>
+                                        <% if (!(notifications === undefined || notifications.length == 0)){ %>
+                                            <% notifications.forEach(function(notification){ %>
+                                                <% if(notification.type == "Approval" && notification.isRead == false){ %>
+                                                    <% approvalNotificationCount++; %>
+                                                <% } if(notification.type == "Form" && notification.isRead == false){ %>
+                                                    <% formNotificationCount++; %>
+                                                <% } %>
+                                            <% }) %>
+                                        <% } %> 
+                                            <% if(formNotificationCount == 0){ %>
+                                                <a class="dropdown-item disabled" href="#">Submit Form <span class="badge"><%= formNotificationCount %></span></a>
+                                            <% } else{ %>
+                                                <a class="dropdown-item disabled" href="#">Submit Form <span class="badge"><%= formNotificationCount %></span></a>
+                                                <% notifications.forEach(function(notification){ %>
+                                                    <% if(notification.type == "Form" && notification.isRead == false){ %>
+                                                        <a class="dropdown-item" href="/notifications/<%= notification._id %>">   <%= notification.text %></a>
+                                                    <% } %>
+                                                <% }) %>
+                                            <% } %>
+                                            
+                                            <% if(approvalNotificationCount == 0){ %>
+                                                <a class="dropdown-item disabled" href="#">View Submissions <span class="badge"><%= approvalNotificationCount %></span></a>
+                                            <% } else{ %>
+                                                <a class="dropdown-item disabled" href="#">View Submissions <span class="badge"><%= approvalNotificationCount %></span></a>
+                                                <% notifications.forEach(function(notification){ %>
+                                                    <% if(notification.type == "Approval" && notification.isRead == false){ %>
+                                                        <a class="dropdown-item" href="/notifications/<%= notification._id %>">   <%= notification.text %></a>
+                                                    <% } %>
+                                                <% }) %>
+                                            <% } %>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item" href="/analytics">Analytics</a>
+                                        </div>
+                                    </div>
+                                    <div class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Signed In As <%= currentUser.username %>
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                          <a class="dropdown-item" href="/academics/<%= currentUser.user.id %>">My Account</a>
+                                          <div class="dropdown-divider"></div>
+                                          <a class="dropdown-item" href="/academics">View Accounts</a>
+                                        </div>
+                                    </div>
+                                <% } %>
+                                <% if(currentUser.role == "Administrator"){ %>
+                                    <div class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Academic Accountability
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                              <a class="dropdown-item" href="/questions">View Questions</a>
+                                              <a class="dropdown-item" href="/questions/new">Add Questions</a>
+                                              <div class="dropdown-divider"></div>
+                                              <a class="dropdown-item" href="/analytics">Analytics</a>
+                                              <div class="dropdown-divider"></div>
+                                              <a class="dropdown-item text-white bg-secondary" href="/activate">Activate Form!</a>
+                                            </div>
+                                        </div>
+                                        <div class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Signed In As <%= currentUser.username %>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                              <a class="dropdown-item" href="/academics">View Accounts</a>
+                                              <div class="dropdown-divider"></div>
+                                              <a class="dropdown-item" href="/register">Register Accounts</a>
+                                              <div class="dropdown-divider"></div>
+                                              <a class="dropdown-item" href="/role">Edit Roles</a>
+                                            </div>
+                                        </div>
+                                <% } %>
+                                <% if(currentUser.role == "Lecturer"){ %>
+                                    <div class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Academic Accountability <span class="badge"><%= notifications.length %></span></a>
+                                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                            <% var notificationCount     = 0; %>
+                                            <% if (!(notifications === undefined || notifications.length == 0)){ %>
+                                                <% notifications.forEach(function(notification){ %>
+                                                        <% notificationCount++; %>
+                                                <% }) %>
+                                            <% } %>
+                                                <% if(notificationCount == 0){ %>
+                                                    <a class="dropdown-item disabled" href="/academics/<%= currentUser.user.id %>/forms/new">Submit Form <span class="badge"><%= formNotificationCount %></span></a>
+                                                <% } else{ %>
+                                                    <a class="dropdown-item" href="/academics/<%= currentUser.user.id %>/forms/new">Submit Form <span class="badge"><%= formNotificationCount %></span></a>
+                                                    <% notifications.forEach(function(notification){ %>
+                                                        <a class="dropdown-item" href="/notifications/<%= notification._id %>">   <%= notification.text %></a>
+                                                    <% }) %>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                        <div class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Signed In As <%= currentUser.username %>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                              <a class="dropdown-item" href="/academics/<%= currentUser.user.id %>">My Account</a>  
+                                            </div>
+                                        </div>
+                                <% } %>
+                                <a class="nav-item nav-link" href="/logout">Logout</a>
+                            <% } %>
+                        </div>
+                    </div>
+            </div>
+        </nav>
+                
+                <div class="grid container">
+                        <% if(error && error.length > 0){ %>
+                            <div class="alert alert-danger sixteen wide column" role="alert">
+                                <%= error %>
+                            </div>
+                        <% } %>
+                        <% if(success && success.length > 0){ %>
+                            <div class="alert alert-success sixteen wide column" role="alert">
+                                <%= success %>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+                <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+                <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js" type="text/javascript" async></script>
+                <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+                <script src="/scripts/show_academic.js"></script>
+<div class="container">
+    <div class="row">
+        <div class="col-3" style="float: left;" >
+            <div class="ui center aligned segment" id="segment">
+                <div class="ui huge header centered"> <%= academic.prefix %> <%= academic.firstName %> <%= academic.secondName %> </div>
+                <img src="<%= academic.profilePicture %>" class="ui centered image">
+                <br>    
+                <div>
+                    <strong>
+                        <p> <%= academic.jobTitle %> </p>
+                        <hr>
+                        <p> <%= academic.department %> </p>
+                        <hr>
+                        <p> <%= academic.faculty %> </p>
+                        <hr>
+                        <p> <%= academic.emailAddress %> </p>
+                        <hr>
+                        <p> <%= academic.telephoneNumber %> </p>
+                    </strong>
+                </div>
+                <br>
+                <% if(currentUser.role == "Administrator"){ %>
+                    <hr class="mt-0">
+                    <div>
+                        <a href="/academics/<%= academic._id %>/edit" style="color: black;" class="mr-0"><i class="fa fa-edit"></i></a>
+                        <form action="/academics/<%= academic._id %>?_method=DELETE" method="POST" style="display: inline;">
+                            <button class="btn" style=" display:inline-block;"><i class="fa fa-trash"></i></button>
+                        </form>
+                    </div>
+                <% } %>
+            </div>
+            <div class="ui center aligned segment" id="segment">
+                    <h4 style="font-weight: bold;">Research Publications</h4>
+                    <% academic.forms.forEach(function(form){ %>
+                        <% if(form.isApproved == true){ %>
+                            <% form.answers[1].answerTexts.forEach(function(publication){ %>
+                                <p><%= publication %></p>
+                            <% }) %>
+                        <% } %>
+                    <% }) %>
+            </div>
+        </div>
+
+        <% var totalTeachingScoreAcademic       = 0; %>
+        <% var totalRdScoreAcademic             = 0; %>
+        <% var totalUndScoreAcademic            = 0; %>
+        <% var semesterTeachingScoreAcademic    = 0; %>
+        <% var semesterRdScoreAcademic          = 0; %>
+        <% var semesterUndScoreAcademic         = 0; %>
+        <% var academicYear; %>
+        <% var semester; %>
+        <% var countAcademic               = academic.forms.length; %>
+
+        <% academic.forms.forEach(function(form){ %>
+            <% if(form.isApproved == true){ %>
+                <% countAcademic--; %>
+                <% totalTeachingScoreAcademic          = totalTeachingScoreAcademic + form.teachingScore; %>
+                <% totalRdScoreAcademic                = totalRdScoreAcademic + form.rdScore; %>
+                <% totalUndScoreAcademic               = totalUndScoreAcademic + form.undScore; %>
+
+                <% if(countAcademic == 0){ %>
+                    <% academicYear            = form.academicYear; %>
+                    <% semester                = form.semester; %>
+                    <% semesterTeachingScoreAcademic   = form.teachingScore; %>
+                    <% semesterRdScoreAcademic         = form.rdScore; %>
+                    <% semesterUndScoreAcademic        = form.undScore; %>
+                <% } %>
+            <% } %>
+        <% }) %>
+
+        <% var avgTeachingScoreAcademic       = totalTeachingScoreAcademic / academic.forms.length; %>
+        <% var avgRdScoreAcademic             = totalRdScoreAcademic / academic.forms.length; %>
+        <% var avgUndScoreAcademic            = totalUndScoreAcademic / academic.forms.length; %>
+
+        
+        
+        <% var totalTeachingScoreAll        = 0; %>
+        <% var totalRdScoreAll              = 0; %>
+        <% var totalUndScoreAll             = 0; %>
+        <% var totalTeachingScoreAllSemester        = 0; %>
+        <% var totalRdScoreAllSemester              = 0; %>
+        <% var totalUndScoreAllSemester             = 0; %>
+        <% var countSemester                        = 0; %>
+        <% var countForms                           = 0; %>
+
+        <% forms.forEach(function(form){ %>
+            <% if(form.isApproved == true){ %>            
+                <% countForms++; %>
+                <% totalTeachingScoreAll    = totalTeachingScoreAll + form.teachingScore; %>
+                <% totalRdScoreAll          = totalRdScoreAll + form.rdScore; %>
+                <% totalUndScoreAll         = totalUndScoreAll + form.undScore; %>
+
+                <% if(form.academicYear == academicYear && form.semester == semester){ %>
+                <%     countSemester++; %>
+                <%     totalTeachingScoreAllSemester   = totalTeachingScoreAllSemester + form.teachingScore; %>
+                <%     totalRdScoreAllSemester         = totalRdScoreAllSemester + form.rdScore; %>
+                <%     totalUndScoreAllSemester        = totalUndScoreAllSemester + form.undScore; %>
+                <% } %>
+            <% } %>
+        <% }) %>
+
+        <% var avgTeachingScoreAll        = totalTeachingScoreAll / countForms; %>
+        <% var avgRdScoreAll              = totalRdScoreAll / countForms; %>
+        <% var avgUndScoreAll             = totalUndScoreAll / countForms; %>
+        <% var avgTeachingScoreSemesterAll       = totalTeachingScoreAllSemester / countSemester; %>
+        <% var avgRdScoreSemesterAll             = totalRdScoreAllSemester / countSemester; %>
+        <% var avgUndScoreSemesterAll            = totalUndScoreAllSemester / countSemester; %>
+
+        <% var pcntTotalTeachingScore = ((avgTeachingScoreAcademic / avgTeachingScoreAll) * 100); %>
+        <% var pcntTotalRdScore       = ((avgRdScoreAcademic / avgRdScoreAll) * 100); %>
+        <% var pcntTotalUndScore      = ((avgUndScoreAcademic / avgUndScoreAll) * 100); %>
+
+        <% var pcntSemesterTeachingScore  = ((semesterTeachingScoreAcademic / avgTeachingScoreSemesterAll) * 100); %>
+        <% var pcntSemesterRdScore        = ((semesterRdScoreAcademic / avgRdScoreSemesterAll) * 100); %>
+        <% var pcntSemesterUndScore       = ((semesterUndScoreAcademic / avgUndScoreSemesterAll) * 100); %>
+
+        <div class="col">
+            <div class="container">
+                <div class="row">
+                    <div class="card col mb-3 mr-3 py-1">
+                        <h1 class="text-left-right">
+                            <span class="left-text">Overall</span>
+                            <span class="byline">Scores</span>
+                        </h1>
+                        <div style="clear: both">
+                            <h3 style="float: left">Teaching</h3>
+                            <h3 style="float: right; margin-top: 1px;"><%= totalTeachingScoreAcademic %></h3>
+                        </div>
+                        <div style="clear: both">
+                                <h3 style="float: left">R&D</h3>
+                                <h3 style="float: right; margin-top: 1px;"><%= totalRdScoreAcademic %></h3>
+                        </div>
+                        <div style="clear: both">
+                                <h3 style="float: left">UN&D</h3>
+                                <h3 style="float: right; margin-top: 1px;"><%= totalUndScoreAcademic %></h3>
+                        </div>
+                    </div>
+                    <div class="card col mb-3 py-1">
+                            <h1 class="text-left-right">
+                                    <span class="left-text">Semester</span>
+                                    <span class="byline">Scores</span>
+                                </h1>
+                                <div style="clear: both">
+                                    <h3 style="float: left">Teaching</h3>
+                                    <h3 style="float: right; margin-top: 1px;"><%= semesterTeachingScoreAcademic %></h3>
+                                </div>
+                                <div style="clear: both">
+                                        <h3 style="float: left">R&D</h3>
+                                        <h3 style="float: right; margin-top: 1px;"><%= semesterRdScoreAcademic %></h3>
+                                </div>
+                                <div style="clear: both">
+                                        <h3 style="float: left">UN&D</h3>
+                                        <h3 style="float: right; margin-top: 1px;"><%= semesterUndScoreAcademic %></h3>
+                                </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="card col mr-3">
+                        <canvas id="totalDoughnutChart"></canvas>
+                    </div>
+                    <div class="card col">
+                        <canvas id="semesterDoughnutChart"></canvas>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="card mt-3 col-12">
+                        <div class="card-body">
+                            <h4 style="font-weight: bold;">Overall Mean Comparision</h4>
+                            <h5 style="font-size: 12px;" class="card-title">Teaching</h5>
+                            <div id="totalTeachingBar" class="bar teaching">
+                                <div></div>
+                            </div>
+                            <h5 style="font-size: 12px;" class="card-title">R&D</h5>
+                            <div id="totalRdBar" class="bar rd">
+                                <div></div>
+                            </div>
+                            <h5 style="font-size: 12px;" class="card-title">U&ND</h5>
+                            <div id="totalUndBar" class="bar und">
+                                <div></div>
+                            </div>
+                        </div>
+                    </div>  
+                </div>
+
+            <div class="row">
+                    <div class="card mt-3 col-12">
+                        <div class="card-body">
+                            <h4 style="font-weight: bold;">Semester Mean Comparision</h4>
+                            <h5 style="font-size: 12px;" class="card-title">Teaching</h5>
+                            <div id="semesterTeachingBar" class="bar teaching">
+                                <div></div>
+                            </div>
+                            <h5 style="font-size: 12px;" class="card-title">R&D</h5>
+                            <div id="semesterRdBar" class="bar rd">
+                                <div></div>
+                            </div>
+                            <h5 style="font-size: 12px;" class="card-title">U&ND</h5>
+                            <div id="semesterUndBar" class="bar und">
+                                <div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    var totalTeachingScoreAcademic      = "<%= totalTeachingScoreAcademic %>";
+    var totalRdScoreAcademic            = "<%= totalRdScoreAcademic %>";
+    var totalUndScoreAcademic           = "<%= totalUndScoreAcademic %>";
+
+    var semesterTeachingScoreAcademic       = "<%= semesterTeachingScoreAcademic %>";
+    var semesterRdScoreAcademic             = "<%= semesterRdScoreAcademic %>";
+    var semesterUndScoreAcademic            = "<%= semesterUndScoreAcademic %>";
+
+        var ctx = document.getElementById('totalDoughnutChart').getContext('2d');
+        var totalDoughnutChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Teaching', 'R&D', 'U&ND'],
+                datasets: [{
+                    label: 'My First dataset',
+                    backgroundColor: ['#17a2b8', '#6c757d', '#ffc107'],
+                    borderColor: ['#17a2b8', '#6c757d', '#ffc107'],
+                    data: [totalTeachingScoreAcademic, totalRdScoreAcademic, totalUndScoreAcademic]
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Overall Composition',
+                    fontFamily: 'Lato, Helvetica',
+                    fontSize: 15,
+                    fontColor: '#000000'
+                },
+                layout: {
+                    padding: {
+                        left: 0,
+                        right: 0,
+                        top: 0,
+                        bottom: 10
+                    }
+                }
+            }
+        });
+
+        var ctx = document.getElementById('semesterDoughnutChart').getContext('2d');
+        var semesterDoughnutChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Teaching', 'R&D', 'U&ND'],
+                datasets: [{
+                    label: 'My First dataset',
+                    backgroundColor: ['#17a2b8', '#6c757d', '#ffc107'],
+                    borderColor: ['#17a2b8', '#6c757d', '#ffc107'],
+                    data: [semesterTeachingScoreAcademic, semesterRdScoreAcademic, semesterUndScoreAcademic]
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Semester Composition',
+                    fontFamily: 'Lato, Helvetica',
+                    fontSize: 15,
+                    fontColor: '#000000'  
+            },
+            layout: {
+                    padding: {
+                        left: 0,
+                        right: 0,
+                        top: 0,
+                        bottom: 10
+                    }
+                }
+            }
+        });
+
+    function changePercentage(elem, perc) {
+    var $div = $(elem).find('div');
+        $div.text(perc + '%');
+        $div.css('width', perc + '%');
+    }
+
+    var pcntTotalTeachingScore      = '<%= pcntTotalTeachingScore %>';
+    var pcntTotalRdScore            = '<%= pcntTotalRdScore %>';
+    var pcntTotalUndScore           = '<%= pcntTotalUndScore %>';
+    var pcntSemesterTeachingScore   = '<%= pcntSemesterTeachingScore %>';
+    var pcntSemesterRdScore         = '<%= pcntSemesterRdScore %>';
+    var pcntSemesterUndScore        = '<%= pcntSemesterUndScore %>';
+
+    changePercentage('#totalTeachingBar', pcntTotalTeachingScore);
+    changePercentage('#totalRdBar', pcntTotalRdScore);
+    changePercentage('#totalUndBar', pcntTotalUndScore);
+    changePercentage('#semesterTeachingBar', pcntSemesterTeachingScore);
+    changePercentage('#semesterRdBar', pcntSemesterRdScore);
+    changePercentage('#semesterUndBar', pcntSemesterUndScore);
+</script>
+
+<% include ../partials/footer.ejs %>

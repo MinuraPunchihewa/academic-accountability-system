@@ -1,0 +1,50 @@
+<% include ../partials/header.ejs %>
+
+<div class="ui main text container">
+    <div class="ui top attached segment" id="segment">
+        <div class="ui divided items">
+        <% if(currentUser.role == "Head of Department"){ %>
+            <% var department = currentUser.user.department; %>
+                <% academics.forEach(function(academic){ %>
+                    <% if(!(academic._id.equals(currentUser.user.id)) && academic.department == department){ %>
+                        <% academic.forms.forEach(function(form){ %>
+                            <% if(form.isApproved == false){ %>
+                                <div class="item">
+                                    <div class="content" style="font-size: medium">
+                                        <a href="/" class="header"> Submission by <%= academic.prefix %> <%= academic.firstName %> <%= academic.secondName %> </a>
+                                        <div class="description">
+                                            <p>On <%= form.created %></p>
+                                            <a href="/academics/<%= academic._id %>/forms/<%= form._id %>" class="btn btn-secondary btn-md" style=" font-family: Lato, Helvetica;">Show More</a>
+                                        </div>
+                                    </div>              
+                                </div>
+                            <% } %>
+                        <% }); %>
+                    <% } %>
+                <% }); %>
+        <% } %>
+        <% if(currentUser.role == "Dean"){ %>
+            <% var faculty = currentUser.user.faculty; %>
+                <% academics.forEach(function(academic){ %>
+                    <% if(!(academic._id.equals(currentUser.user.id)) && academic.faculty == faculty){ %>
+                        <% academic.forms.forEach(function(form){ %>
+                            <% if(form.isApproved == false){ %>
+                                <div class="item">
+                                    <div class="content" style="font-size: medium">
+                                        <a href="/" class="header"> Submission by <%= academic.prefix %> <%= academic.firstName %> <%= academic.secondName %> </a>
+                                        <div class="description">
+                                            <p>On <%= form.created %></p>
+                                            <a href="/academics/<%= academic._id %>/forms/<%= form._id %>" class="btn btn-secondary btn-md" style=" font-family: Lato, Helvetica;">Show More</a>
+                                        </div>
+                                    </div>              
+                                </div>
+                            <% } %>
+                        <% }); %>
+                    <% } %>
+                <% }); %>
+        <% } %>
+        </div>
+    </div>
+</div>
+    
+<% include ../partials/footer.ejs %>

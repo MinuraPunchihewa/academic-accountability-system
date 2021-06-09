@@ -1,0 +1,74 @@
+<% include ../partials/header.ejs %>
+
+<div class="ui main text container segment">
+        <div class="ui huge header">Edit Account</div>
+        <form action="/academics/<%= academic._id %>?_method=PUT" enctype="multipart/form-data" method="POST" class="ui form">
+            <div class="field">
+                    <label for="profilePicture">Profile Picture</label>
+                    <input type="file" name="profilePicture"  class="inputfile">
+            </div>
+            
+            <div class="field">
+                <label for="prefix">Prefix</label>
+                <select class="ui search dropdown" name="prefix" id="prefix">
+                    <option value="<%= academic.prefix %>" hidden><%= academic.prefix %></option>
+                    <option value="Ms">Ms</option>
+                    <option value="Mr">Mr</option>
+                    <option value="Mrs">Mrs</option>
+                    <option value="Dr">Dr</option>
+                    <option value="Prof">Prof</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="firstName">First Name</label>
+                <input type="text" name="firstName" value="<%= academic.firstName %>" required>
+            </div>
+    
+            <div class="field">
+                <label for="secondName">Second Name</label>
+                <input type="text" name="secondName" value="<%= academic.secondName %>" required>
+            </div>
+
+            <div class="field">
+                    <label for="emailAddress">Email Address</label>
+                    <input type="email" name="emailAddress" value="<%= academic.emailAddress %>" required>
+            </div>    
+            
+            <div class="field">
+                <label for="telephoneNumber">Telephone Number</label>
+                <input type="tel" name="telephoneNumber" value="<%= academic.telephoneNumber %>">
+            </div> 
+
+            <div class="field">
+                    <label for="jobTitle">Job Title</label>
+                    <input type="text" name="jobTitle" value="<%= academic.jobTitle %>">
+            </div>
+            
+            <div class="field">
+                <label for="faculty">Faculty</label>
+                <select class="ui search dropdown" name="faculty" id="faculty" value="<%= academic.faculty %>" required >
+                    <option value="<%= academic.faculty %>" hidden><%= academic.faculty %></option>
+                    <option value="Faculty of Commerce & Management Studies">Faculty of Commerce & Management Studies</option>
+                    <option value="Faculty of Computing & Technology">Faculty of Computing & Technology</option>
+                    <option value="Faculty of Graduate Studies">Faculty of Graduate Studies</option>
+                    <option value="Faculty of Humanities">Faculty of Humanities</option>
+                    <option value="Faculty of Medicine">Faculty of Medicine</option>
+                    <option value="Faculty of Science">Faculty of Science</option>
+                    <option value="Faculty of Social Sciences">Faculty of Social Sciences</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="department">Department</label>
+                <select class="ui search dropdown" name="department" id="department" required>
+                        <option value="<%= academic.department %>" hidden><%= academic.department %></option>
+                </select>
+            </div>
+            
+            <input style="width: 100%; font-family: Lato, Helvetica;" type="submit" class="btn btn-secondary btn-lg" value="EDIT ACCOUNT">
+        </form>
+    </div>
+
+<% include ../partials/footer.ejs %>
+
